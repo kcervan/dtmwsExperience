@@ -1,0 +1,22 @@
+minimum_cumulusci_version: '3.76.0'
+project:
+    name: dtmwsExperience
+    package:
+        name: dtmwsExperience
+        api_version: '57.00'
+    git:
+        default_branch: 'main'
+    source_format: sfdx
+
+tasks:
+    robot:
+        options:
+            suites: robot/dtmwsExperience/tests
+            options:
+                outputdir: robot/dtmwsExperience/results
+
+    robot_testdoc:
+        options:
+            path: robot/dtmwsExperience/tests
+            output: robot/dtmwsExperience/doc/dtmwsExperience_tests.html
+
