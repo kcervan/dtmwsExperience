@@ -1,0 +1,70 @@
+create LWC component to show Horses__c list including Key_Photo__c, Name, Partnership__c, PartnershipFormula__c,  Status__c, Sex__c, Location__c attributes with apex method and wire decorator using card.
+The key_photo__c attribute should display as a header image within the card. Key_Photo__c is a rich text field.
+we need to be able to deploy and use this LWC in a customer community. 
+If there is not a Key_Photo__c, put the image located within static resources named 'imageComingSoon' MIME Type	image/png.
+When you click card, the component should redirect you to the record page of the selected record within the customer community. 
+
+i need to be able to filter the list of horses displayed. I want to be able to select from a picklist or buttons. 
+'All Horses' doesn't filter out any horses. 
+'My Horses' shows records based on the user viewing the component in experience cloud. 'My Horses', shows Horse__c records WHERE Horse__c.Partnership__c IN( CurrentUser.Contact__r.PartnerMembership__c.Partnership_Account__c )
+Dynamic Partnership filter, I want to be able to filter by my Partnership Accounts. ie: 'DTMWS 2022 LLC' horses if I have a related Partner Membership record to '2022 DTMWS Partnership LLC'
+
+
+GOOD JS
+navigateToRecordPage(event) {
+    event.preventDefault();
+    const horseId = event.currentTarget.dataset.id;
+    this[NavigationMixin.GenerateUrl]({
+        type: 'standard__webPage',
+        attributes: {
+            url: `/DTMWS/s/horse/${horseId}`
+        },
+    })
+    .then(url => {
+        window.open(url);
+    });
+}
+
+
+LAST WORKING HTML
+<template>
+    <lightning-card title="Horses List" icon-name="custom:custom14">
+        <div class="slds-m-around_medium">
+            <template if:true={horses.data}>
+                <div class="slds-grid slds-wrap">
+                    <template for:each={horses.data} for:item="horse">
+                        <div key={horse.Id} class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3 card-padding">
+                            <lightning-card>
+                                <div class="slds-card__header slds-grid">
+                                    <div class="centered">
+                                        <template if:true={horse.Key_Photo__c}>
+                                            <a onclick={navigateToRecordPage} data-id={horse.Id}>
+                                                <lightning-formatted-rich-text value={horse.Key_Photo__c}></lightning-formatted-rich-text>
+                                            </a>
+                                        </template>
+                                        <template if:false={horse.Key_Photo__c}>
+                                            <img src={placeholderImageUrl} alt="IMAGE COMING SOON" width="100%" height="auto" />
+                                        </template>
+                                    </div>
+                                </div>
+                                <div class="slds-card__body slds-card__body_inner">
+                                    <p><b>Name:</b> {horse.Name}</p>
+                                    <p><b>Partnership:</b> {horse.Partnership__c}</p>
+                                    <p><b>Status:</b> {horse.Status__c}</p>
+                                    <p><b>Sex:</b> {horse.Sex__c}</p>
+                                    <p><b>Location:</b> {horse.Location__c}</p>
+                                </div>
+                            </lightning-card>
+                        </div>
+                    </template>
+                </div>
+            </template>
+            <template if:true={horses.error}>
+                <div class="slds-text-color_error">{horses.error}</div>
+            </template>
+        </div>
+    </lightning-card>
+</template>
+
+
+To find 'My Horses' data we need to query Id, Partnership_Account__c, Contact__c FROM PartnerMembership__c WHERE Contact__c = CurrentUser.ContactId. Let's call this list PartnerMemberships. Then we need to query id, Partnership__c from Horse__c WHERE Partnership__c IN( PartnerMemberships.Partnership_Account__c)

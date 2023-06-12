@@ -1,0 +1,1 @@
+SELECT Key_Photo__c, Name, Partnership__r.Name,  Status__c, Sex__c, Location__c FROM Horse__c
